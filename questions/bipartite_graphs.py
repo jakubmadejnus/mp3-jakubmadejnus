@@ -43,6 +43,32 @@ Tags:
 """
 
 from typing import List
+from collections import deque
 
 def isBipartite(graph: List[List[int]]) -> bool:
-  return False
+    n = len(graph)
+    color = [-1] * n  # -1: uncolored, 0: color A, 1: color B
+    
+    for i in range(n):
+        # If the node is uncolored and the BFS coloring leads to a contradiction, return False
+        if color[i] == -1 and not bfs_coloring(graph, color, i):
+            return False
+    
+    return True
+
+def bfs_coloring(graph: List[List[int]], color: List[int], start: int) -> bool:
+    queue = deque([start])
+    color[start] = 0  # Start with color A
+    
+    while queue:
+        node = queue.popleft()
+        for neighbor in graph[node]:
+            # If the neighbor is uncolored, color it with the opposite color and add it to the queue
+            if color[neighbor] == -1:
+                color[neighbor] = 1 - color[node]
+                queue.append(neighbor)
+            # If the neighbor has the same color, the graph is not bipartite
+            elif color[neighbor] == color[node]:
+                return False
+    
+    return True

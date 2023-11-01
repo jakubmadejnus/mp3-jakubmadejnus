@@ -30,7 +30,34 @@ Tags:
     - DFS
     - Graph
 """
-from typing import List
+from typing import List, Set
 
 def num_distinct_islands(grid: List[List[int]]) -> int:
-  return 0
+    if not grid:
+        return 0
+    
+    m, n = len(grid), len(grid[0])
+    distinct_islands = set()
+    
+    def dfs(r, c, path):
+        if 0 <= r < m and 0 <= c < n and grid[r][c] == 1:
+            grid[r][c] = 0
+            
+            path.append((r, c))
+            dfs(r + 1, c, path)
+            dfs(r - 1, c, path)
+            dfs(r, c + 1, path)
+            dfs(r, c - 1, path)
+
+    for r in range(m):
+        for c in range(n):
+            if grid[r][c] == 1:
+                path = []
+                dfs(r, c, path)
+                                
+                if path:
+                    min_r = min(pt[0] for pt in path)
+                    min_c = min(pt[1] for pt in path)
+                    distinct_islands.add(tuple((x - min_r, y - min_c) for x, y in path))
+    
+    return len(distinct_islands)

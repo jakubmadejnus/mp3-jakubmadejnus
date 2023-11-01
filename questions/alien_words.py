@@ -47,7 +47,43 @@ Tags:
     - Graphs
     - Topological Sorting
 """
-from typing import List
+from typing import List, DefaultDict
+from collections import defaultdict, deque
 
 def find_order(words: List[str]) -> str:
-  return ""
+    # Helper function to build the graph
+    def build_graph(words):
+        for i in range(len(words) - 1):
+            word1, word2 = words[i], words[i+1]
+            for j in range(min(len(word1), len(word2))):
+                if word1[j] != word2[j]:
+                    graph[word1[j]].add(word2[j])
+                    in_degree[word2[j]] += 1
+                    break
+    
+    # Helper function to perform topological sort
+    def topological_sort():
+        # Find the sources i.e., nodes with 0 in-degrees
+        sources = deque([c for c in in_degree if in_degree[c] == 0])
+        order = []
+        
+        while sources:
+            char = sources.popleft()
+            order.append(char)
+            for next_char in graph[char]:
+                in_degree[next_char] -= 1
+                if in_degree[next_char] == 0:
+                    sources.append(next_char)
+                    
+        # Check if we have some cycle in the graph
+        if len(order) != len(in_degree):
+            return ""
+        return "".join(order)
+    
+    # Initialize the graph
+    graph = defaultdict(set)
+    in_degree = {c: 0 for word in words for c in word}
+    
+    # Build the graph and perform topological sort
+    build_graph(words)
+    return topological_sort()

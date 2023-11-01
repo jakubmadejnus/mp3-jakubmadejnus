@@ -44,4 +44,22 @@ Tags:
 from typing import List
 
 def findCircleNum(isConnected: List[List[int]]) -> int:
-  return 0
+    def dfs(city):
+        for next_city in range(n):
+            # If the next city is connected and has not been visited
+            if isConnected[city][next_city] == 1 and not visited[next_city]:
+                visited[next_city] = True
+                dfs(next_city)
+                
+    n = len(isConnected)
+    visited = [False] * n
+    provinces = 0
+    
+    for city in range(n):
+        # If the city has not been visited, start DFS from it
+        if not visited[city]:
+            provinces += 1
+            visited[city] = True
+            dfs(city)
+            
+    return provinces

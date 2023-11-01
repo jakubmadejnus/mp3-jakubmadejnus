@@ -38,6 +38,49 @@ Tags:
     - Topological Sorting
 """
 from typing import List
+from collections import deque
 
 def can_construct(originalSeq: List[int], seqs: List[List[int]]) -> bool:
-  return False
+    # Initialize the graph and in-degree array
+    graph = {}
+    in_degree = {}
+    
+    # Build the graph based on sequences
+    for seq in seqs:
+        for num in seq:
+            if num not in graph:
+                graph[num] = []
+                in_degree[num] = 0
+            
+    # Add edges to the graph and update in-degree array
+    for seq in seqs:
+        for i in range(1, len(seq)):
+            parent, child = seq[i-1], seq[i]
+            graph[parent].append(child)
+            in_degree[child] += 1
+    
+    # Ensure all numbers in the original sequence are in the graph
+    if len(originalSeq) != len(in_degree):
+        return False
+    
+    # Topological sort
+    sources = deque()
+    for node in in_degree:
+        if in_degree[node] == 0:
+            sources.append(node)
+    
+    sorted_order = []
+    while sources:
+        if len(sources) > 1:
+            # More than one source means that there are multiple ways to reconstruct the sequence
+            return False
+        
+        node = sources.popleft()
+        sorted_order.append(node)
+        
+        for child in graph[node]:
+            in_degree[child] -= 1
+            if in_degree[child] == 0:
+                sources.append(child)
+                
+    return sorted_order == originalSeq

@@ -57,6 +57,45 @@ Tags:
 """
 
 from typing import List
+from collections import deque
 
 def possible_task_orders(tasks: int, prerequisites: List[List[int]]) -> List[List[int]]:
-  return [['a', 'l', 'a', 'n'], ['w', 'a', 's'], ['h', 'e', 'r', 'e']]
+    # Initialize in-degree array and graph
+    in_degree = [0] * tasks
+    graph = {i: [] for i in range(tasks)}
+    
+    # Build graph and in-degree array
+    for prereq in prerequisites:
+        parent, child = prereq
+        graph[parent].append(child)
+        in_degree[child] += 1
+    
+    # Function to perform DFS and find all possible orders
+    def dfs(current_order):
+        if len(current_order) == tasks:
+            result.append(list(current_order))
+            return
+        
+        for i in range(tasks):
+            if in_degree[i] == 0 and not visited[i]:
+                # Decrement in-degree for adjacent tasks
+                for child in graph[i]:
+                    in_degree[child] -= 1
+                
+                # Mark task as visited and add to current order
+                visited[i] = True
+                current_order.append(i)
+                
+                # Recursive call
+                dfs(current_order)
+                
+                # Backtrack to explore other orders
+                visited[i] = False
+                current_order.pop()
+                for child in graph[i]:
+                    in_degree[child] += 1
+                
+    visited = [False] * tasks
+    result = []
+    dfs([])
+    return result

@@ -38,6 +38,40 @@ Tags:
 """
 
 from typing import List
+from collections import defaultdict
 
 def can_schedule_tasks(tasks: int, prerequisites: List[List[int]]) -> bool:
-  return False 
+    # Build the graph
+    graph = defaultdict(list)
+    for pre, task in prerequisites:
+        graph[pre].append(task)
+    
+    # Helper function to perform DFS
+    def dfs(node, visited, rec_stack):
+        visited[node] = True
+        rec_stack[node] = True
+        
+        for neighbor in graph[node]:
+            if not visited[neighbor]:
+                if dfs(neighbor, visited, rec_stack):
+                    return True
+            elif rec_stack[neighbor]:
+                # Cycle detected
+                return True
+            
+        # Remove the node from the recursion stack as we leave the recursion
+        rec_stack[node] = False
+        return False
+    
+    # Initialize visited and recursion stack arrays
+    visited = [False] * tasks
+    rec_stack = [False] * tasks
+    
+    # Perform DFS to detect cycle
+    for i in range(tasks):
+        if not visited[i]:
+            if dfs(i, visited, rec_stack):
+                return False
+    
+    # No cycle detected
+    return True

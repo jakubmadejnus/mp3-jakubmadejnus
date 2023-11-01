@@ -47,4 +47,31 @@ Tags:
 from typing import List
 
 def canFinish(numCourses: int, prerequisites: List[List[int]]) -> bool:
-    return False
+    # Construct the adjacency list
+    graph = [[] for _ in range(numCourses)]
+    for course, prereq in prerequisites:
+        graph[course].append(prereq)
+    
+    # States: 0 = unvisited, 1 = visiting, 2 = visited
+    states = [0] * numCourses
+    
+    def hasCycle(node):
+        if states[node] == 1:
+            return True
+        if states[node] == 2:
+            return False
+        
+        states[node] = 1
+        
+        for neighbor in graph[node]:
+            if hasCycle(neighbor):
+                return True
+        
+        states[node] = 2
+        return False
+    
+    for i in range(numCourses):
+        if hasCycle(i):
+            return False
+    
+    return True

@@ -35,6 +35,35 @@ Tags:
     - BFS
 """
 from typing import List
+from collections import defaultdict, deque
 
 def find_mht_roots(vertices: int, edges: List[List[int]]) -> List[int]:
-  return []
+    # Base cases
+    if vertices == 0:
+        return []
+    if vertices == 1:
+        return [0]
+    
+    # Build the graph as an adjacency list
+    graph = defaultdict(set)
+    for u, v in edges:
+        graph[u].add(v)
+        graph[v].add(u)
+    
+    # Start with the leaves (nodes with only one edge)
+    leaves = deque([node for node in graph if len(graph[node]) == 1])
+    
+    # Remove leaves level by level
+    remaining_nodes = vertices
+    while remaining_nodes > 2:
+        num_leaves = len(leaves)
+        remaining_nodes -= num_leaves
+        
+        for _ in range(num_leaves):
+            leaf = leaves.popleft()
+            for neighbor in graph[leaf]:
+                graph[neighbor].remove(leaf)
+                if len(graph[neighbor]) == 1:
+                    leaves.append(neighbor)
+    
+    return list(leaves)
